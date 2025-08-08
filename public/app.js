@@ -4,11 +4,6 @@ const proveedoresTable = document.getElementById('proveedoresTable');
 const proveedoresBody = document.getElementById('proveedoresBody');
 const searchInput = document.getElementById('searchInput');
 const noResults = document.getElementById('noResults');
-const modal = document.getElementById('proveedorModal');
-const modalForm = document.getElementById('proveedorForm');
-const modalTitle = document.getElementById('modalTitle');
-const closeBtn = document.querySelector('.close');
-const cancelBtn = document.getElementById('cancelBtn');
 
 let modoEdicion = false;
 let proveedorActualId = null;
@@ -112,22 +107,13 @@ async function eliminarProveedor(id) {
     }
 }
 
-// Función para mostrar un mensaje de error
 function mostrarError(mensaje) {
-    // Usar un toast o alerta más amigable
     alert(`Error: ${mensaje}`);
 }
 
-// Función para mostrar un mensaje
-function mostrarMensaje(mensaje) {
-    // Usar un toast o alerta más amigable
-    alert(mensaje);
-}
 
-// Función para editar un proveedor
 async function editarProveedor(id) {
     try {
-        // Obtener los datos actuales del proveedor
         const response = await fetch(`${API_URL}/buscarporid/${id}`);
         const data = await response.json();
         
