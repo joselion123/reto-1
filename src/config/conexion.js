@@ -3,20 +3,20 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-class Database {
+class BaseDatos {
     constructor() {
-        if (Database.instance) {
-            return Database.instance;
+        if (BaseDatos.instancia) {
+            return BaseDatos.instancia;
         }
         
-        this.connection = null;
-        Database.instance = this;
+        this.conexion = null;
+        BaseDatos.instancia = this;
     }
 
-    async connect() {
-        if (!this.connection) {
+    async conectar() {
+        if (!this.conexion) {
             try {
-                this.connection = await mysql.createConnection({
+                this.conexion = await mysql.createConnection({
                     host: process.env.DB_HOST,
                     user: process.env.DB_USER,
                     database: process.env.DB_NAME,
@@ -29,21 +29,21 @@ class Database {
                 throw error;
             }
         }
-        return this.connection;
+        return this.conexion;
     }
 
-    async query(sql, params) {
-        const connection = await this.connect();
-        return connection.query(sql, params);
+    async query(sql, parametros) {
+        const conexion = await this.conectar();
+        return conexion.query(sql, parametros);
     }
 
-    async close() {
-        if (this.connection) {
-            await this.connection.end();
-            this.connection = null;
+    async cerrar() {
+        if (this.conexion) {
+            await this.conexion.end();
+            this.conexion = null;
         }
     }
 }
 
-const database = new Database();
-export default database;
+const baseDatos = new BaseDatos();
+export default baseDatos;

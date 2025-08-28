@@ -1,25 +1,25 @@
-import dbConexion from '../config/conexion.js';
+import baseDatos from '../config/conexion.js';
 
 class Proveedor {
-    constructor(data = {}) {
-        this.id = data.id;
-        this.nombres = data.nombres;
-        this.apellidos = data.apellidos;
-        this.direccion = data.direccion;
-        this.email = data.email;
-        this.telefono = data.telefono;
-        this.ciudad = data.ciudad;
-        this.estado = data.estado;
+    constructor(datos = {}) {
+        this.id = datos.id;
+        this.nombres = datos.nombres;
+        this.apellidos = datos.apellidos;
+        this.direccion = datos.direccion;
+        this.email = datos.email;
+        this.telefono = datos.telefono;
+        this.ciudad = datos.ciudad;
+        this.estado = datos.estado;
     }
 
-    validate() {
-        const errors = [];
-        if (!this.nombres) errors.push('Nombres es requerido');
-        if (!this.apellidos) errors.push('Apellidos es requerido');
-        if (this.email && !this.validarEmail(this.email)) errors.push('Email inválido');
+    validar() {
+        const errores = [];
+        if (!this.nombres) errores.push('Nombres es requerido');
+        if (!this.apellidos) errores.push('Apellidos es requerido');
+        if (this.email && !this.validarEmail(this.email)) errores.push('Email inválido');
         return {
-            isValid: errors.length === 0,
-            errors
+            esValido: errores.length === 0,
+            errores
         };
     }
 
@@ -27,11 +27,11 @@ class Proveedor {
         return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
     }
 
-    NombreCompleto() {
+    obtenerNombreCompleto() {
         return `${this.nombres} ${this.apellidos}`.trim();
     }
 
-    toJSON() {
+    aJSON() {
         return {
             id: this.id,
             nombres: this.nombres,
@@ -46,26 +46,26 @@ class Proveedor {
 
     static async buscartodos() {
         try {
-            const query = "SELECT * FROM proveedor ORDER BY apellidos DESC";
-            const [result] = await dbConexion.query(query);
-            return result;
+            const consulta = "SELECT * FROM proveedor ORDER BY apellidos DESC";
+            const [resultado] = await baseDatos.query(consulta);
+            return resultado;
         } catch (error) {
             throw new Error(`Error al buscar proveedores: ${error.message}`);
         }
     }
 
-    static async crear(proveedorData) {
+    static async crear(datosProveedor) {
         try {
-            const proveedor = new Proveedor(proveedorData);
-            const validation = proveedor.validate();
+            const proveedor = new Proveedor(datosProveedor);
+            const validacion = proveedor.validar();
             
-            if (!validation.isValid) {
-                throw new Error(`Validación fallida: ${validation.errors.join(', ')}`);
+            if (!validacion.esValido) {
+                throw new Error(`Validación fallida: ${validacion.errores.join(', ')}`);
             }
 
-            const query = "INSERT INTO proveedor SET ?";
-            const [result] = await dbConexion.query(query, [proveedor.toJSON()]);
-            return result;
+            const consulta = "INSERT INTO proveedor SET ?";
+            const [resultado] = await baseDatos.query(consulta, [proveedor.aJSON()]);
+            return resultado;
         } catch (error) {
             throw new Error(`Error al crear proveedor: ${error.message}`);
         }
@@ -74,9 +74,9 @@ class Proveedor {
     static async encontrarporapellido(apellido) {
         try {
             if (!apellido) throw new Error('Apellido es requerido');
-            const query = "SELECT * FROM proveedor WHERE apellidos LIKE ? ORDER BY apellidos ASC";
-            const [result] = await dbConexion.query(query, [apellido + '%']);
-            return result;
+            const consulta = "SELECT * FROM proveedor WHERE apellidos LIKE ? ORDER BY apellidos ASC";
+            const [resultado] = await baseDatos.query(consulta, [apellido + '%']);
+            return resultado;
         } catch (error) {
             throw new Error(`Error al buscar por apellido: ${error.message}`);
         }
@@ -84,29 +84,29 @@ class Proveedor {
 
     static async encontrarporid(id) {
         try {
-            const query = "SELECT * FROM proveedor WHERE id = ?";
-            const [result] = await dbConexion.query(query, [id]);
-            return result.length > 0 ? result[0] : null;
+            const consulta = "SELECT * FROM proveedor WHERE id = ?";
+            const [resultado] = await baseDatos.query(consulta, [id]);
+            return resultado.length > 0 ? resultado[0] : null;
         } catch (error) {
             throw new Error(`Error al buscar por ID: ${error.message}`);
         }
     }
 
-    static async actualizar(id, data) {
+    static async actualizar(id, datos) {
         try {
-            const proveedor = new Proveedor(data);
-            const validation = proveedor.validate();
+            const proveedor = new Proveedor(datos);
+            const validacion = proveedor.validar();
             
-            if (!validation.isValid) {
-                throw new Error(`Validación fallida: ${validation.errors.join(', ')}`);
+            if (!validacion.esValido) {
+                throw new Error(`Validación fallida: ${validacion.errores.join(', ')}`);
             }
 
-            const query = "UPDATE proveedor SET ? WHERE id = ?";
-            const cleanData = Object.fromEntries(
-                Object.entries(proveedor.toJSON()).filter(([key, value]) => value !== undefined && key !== 'id')
+            const consulta = "UPDATE proveedor SET ? WHERE id = ?";
+            const datosLimpios = Object.fromEntries(
+                Object.entries(proveedor.aJSON()).filter(([clave, valor]) => valor !== undefined && clave !== 'id')
             );
-            const [result] = await dbConexion.query(query, [cleanData, id]);
-            return result;
+            const [resultado] = await baseDatos.query(consulta, [datosLimpios, id]);
+            return resultado;
         } catch (error) {
             throw new Error(`Error al actualizar proveedor: ${error.message}`);
         }
@@ -114,9 +114,9 @@ class Proveedor {
 
     static async eliminar(id) {
         try {
-            const query = "DELETE FROM proveedor WHERE id = ?";
-            const [result] = await dbConexion.query(query, [id]);
-            return result;
+            const consulta = "DELETE FROM proveedor WHERE id = ?";
+            const [resultado] = await baseDatos.query(consulta, [id]);
+            return resultado;
         } catch (error) {
             throw new Error(`Error al eliminar proveedor: ${error.message}`);
         }

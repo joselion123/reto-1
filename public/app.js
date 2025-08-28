@@ -74,10 +74,10 @@ class ProveedorUI {
     async cargarProveedores() {
         try {
             const respuesta = await this.api.obtenerTodos();
-            if (respuesta.success) {
-                this.renderizarProveedores(respuesta.data);
+            if (respuesta.exito) {
+                this.renderizarProveedores(respuesta.datos);
             } else {
-                this.mostrarError(respuesta.message);
+                this.mostrarError(respuesta.mensaje);
             }
         } catch (error) {
             this.mostrarError('Error de conexión con el servidor');
@@ -119,10 +119,10 @@ class ProveedorUI {
 
         try {
             const respuesta = await this.api.buscarPorApellido(terminoBusqueda);
-            if (respuesta.success) {
-                this.renderizarProveedores(respuesta.data);
+            if (respuesta.exito) {
+                this.renderizarProveedores(respuesta.datos);
             } else {
-                this.mostrarError(respuesta.message);
+                this.mostrarError(respuesta.mensaje);
             }
         } catch (error) {
             this.mostrarError('Error al buscar proveedores');
@@ -136,11 +136,11 @@ class ProveedorUI {
 
         try {
             const respuesta = await this.api.eliminar(id);
-            if (respuesta.success) {
+            if (respuesta.exito) {
                 alert('Proveedor eliminado exitosamente');
                 this.cargarProveedores();
             } else {
-                this.mostrarError(respuesta.message);
+                this.mostrarError(respuesta.mensaje);
             }
         } catch (error) {
             this.mostrarError('Error al eliminar el proveedor');
@@ -150,10 +150,10 @@ class ProveedorUI {
     async editarProveedor(id) {
         try {
             const respuesta = await this.api.obtenerPorId(id);
-            if (respuesta.success) {
-                this.abrirModalEdicion(respuesta.data);
+            if (respuesta.exito) {
+                this.abrirModalEdicion(respuesta.datos);
             } else {
-                this.mostrarError(respuesta.message);
+                this.mostrarError(respuesta.mensaje);
             }
         } catch (error) {
             this.mostrarError('Error al cargar los datos del proveedor');
