@@ -3,20 +3,47 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-let dbConexion;
+class Database {
+    constructor() {
+        if (Database.instance) {
+            return Database.instance;
+        }
+        
+        this.connection = null;
+        Database.instance = this;
+    }
 
-try {
-  dbConexion = await mysql.createConnection({
-    host: process.env.DB_HOST,
-    user: process.env.DB_USER,
-    database: process.env.DB_NAME,
-    port: process.env.DB_PORT,
-    password: process.env.DB_PASSWORD,
-  });
+    async connect() {
+        if (!this.connection) {
+            try {
+                this.connection = await mysql.createConnection({
+                    host: process.env.DB_HOST,
+                    user: process.env.DB_USER,
+                    database: process.env.DB_NAME,
+                    port: process.env.DB_PORT,
+                    password: process.env.DB_PASSWORD,
+                });
+                console.log("✅ Conexión a MySQL exitosa");
+            } catch (error) {
+                console.error("❌ Error al conectar a MySQL:", error.message);
+                throw error;
+            }
+        }
+        return this.connection;
+    }
 
-  console.log("✅ Conexión a MySQL exitosa");
-} catch (err) {
-  console.error("❌ Error al conectar a MySQL:", err.message);
+    async query(sql, params) {
+        const connection = await this.connect();
+        return connection.query(sql, params);
+    }
+
+    async close() {
+        if (this.connection) {
+            await this.connection.end();
+            this.connection = null;
+        }
+    }
 }
 
-export default dbConexion;
+const database = new Database();
+export default database;
